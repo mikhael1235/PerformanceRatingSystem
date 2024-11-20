@@ -1,0 +1,29 @@
+﻿@model PerformanceRatingSystem.Application.Dtos.DepartmentDto
+@{
+    Layout = "_Layout";
+}
+
+<h2>Детали департамента</h2>
+
+<div>
+    <h4>Департамент</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">ID</dt>
+        <dd class="col-sm-10">@Model.DepartmentId</dd>
+
+        <dt class="col-sm-2">Название</dt>
+        <dd class="col-sm-10">@Model.Name</dd>
+
+        <dt class="col-sm-2">Сотрудники</dt>
+        <ul class="row">
+        @foreach (var employee in Model.Employees)
+        {
+            <li class="col-sm-10">[@employee.Position] @employee.FullName</li>
+        }
+        </ul>
+    </dl>
+</div>
+
+<a asp-controller="Departments" asp-action="Edit" asp-route-id="@Model.DepartmentId">Редактировать</a> |
+<a asp-controller="Departments" asp-action="Index">Назад к списку</a>

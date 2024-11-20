@@ -1,0 +1,29 @@
+﻿@model IEnumerable<PerformanceRatingSystem.Application.Dtos.DepartmentDto>
+@{
+    Layout = "_Layout";
+}
+
+<h2>Отделы</h2>
+<a class="btn btn-primary" asp-controller="Departments" asp-action="Create">Создать новый отдел</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var department in Model)
+        {
+            <tr>
+                <td>@department.Name</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-controller="Departments" asp-action="Details" asp-route-id="@department.DepartmentId">Подробнее</a> |
+                    <a class="btn btn-sm btn-danger" asp-controller="Departments" asp-action="Delete" asp-route-id="@department.DepartmentId">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

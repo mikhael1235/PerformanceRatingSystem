@@ -1,0 +1,30 @@
+﻿@model IEnumerable<PerformanceRatingSystem.Application.Dtos.EmployeePerformanceIndicatorDto>
+@{
+    Layout = "_Layout";
+}
+
+<h2>Показатели производительности сотрудников</h2>
+
+<a class="btn btn-primary" asp-controller="EmployeePerformanceIndicators" asp-action="Create">Создать новый показатель</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Сотрудник</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var indicator in Model)
+        {
+            <tr>
+                <td>@indicator.Name</td>
+                <td>@indicator.Employee?.FullName</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-controller="EmployeePerformanceIndicators" asp-action="Details" asp-route-id="@indicator.IndicatorId">Подробнее</a> |
+                    <a class="btn btn-sm btn-danger" asp-controller="EmployeePerformanceIndicators" asp-action="Delete" asp-route-id="@indicator.IndicatorId">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

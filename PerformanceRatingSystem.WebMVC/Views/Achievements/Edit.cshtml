@@ -1,0 +1,47 @@
+﻿@model PerformanceRatingSystem.Application.Dtos.AchievementForUpdateDto
+@{
+    ViewBag.Title = "Редактирование достижения";
+}
+
+<h2>Редактировать достижение</h2>
+
+<form asp-action="Edit" asp-controller="Achievements">
+    <h4>Достижение</h4>
+    <hr />
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="form-group">
+        <input type="hidden" asp-for="Id" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description" class="control-label col-md-2">Описание достижения</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DateAchieved" class="control-label col-md-2">Дата достижения</label>
+        <input asp-for="DateAchieved" class="form-control" type="date" />
+        <span asp-validation-for="DateAchieved" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EmployeeId" class="control-label col-md-2">Сотрудник</label>
+        <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId"></select>
+        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Сохранить" class="btn btn-warning" />
+    </div>
+</form>
+<div>
+    <a asp-action="Index" class="btn btn-sm btn-primary">Вернуться</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

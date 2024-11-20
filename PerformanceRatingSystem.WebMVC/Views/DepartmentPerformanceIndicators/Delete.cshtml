@@ -1,0 +1,31 @@
+﻿@model PerformanceRatingSystem.Application.Dtos.DepartmentPerformanceIndicatorDto
+
+@{
+    ViewData["Title"] = "Удалить индикатор производительности отдела";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Удаление индикатора производительности отдела</h2>
+
+<h3>Вы уверены, что хотите удалить это?</h3>
+<div>
+    <h4>Индикатор производительности</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dd>
+            @Html.DisplayFor(model => model.Department.Name) 
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="IndicatorId" />
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-controller="DepartmentPerformanceIndicators" asp-action="Index" class="btn btn-default">Вернуться к списку</a>
+    </form>
+</div>

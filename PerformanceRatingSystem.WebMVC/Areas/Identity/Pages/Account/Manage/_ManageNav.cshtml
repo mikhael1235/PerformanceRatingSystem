@@ -1,0 +1,7 @@
+﻿@inject SignInManager<User> SignInManager
+
+<ul class="nav nav-pills nav-link">
+    <li class="nav-item @ManageNavPages.IndexNavClass(ViewContext)"><a nav-link text-dark asp-page="./Index">Профиль</a></li>
+    <li class="nav-item @ManageNavPages.ChangePasswordNavClass(ViewContext)"><a nav-link text-dark id="change-password" asp-page="./ChangePassword">Пароль</a></li>
+    <li class="nav-item @ManageNavPages.PersonalDataNavClass(ViewContext)"><a nav-link text-dark asp-page="./PersonalData">Личные данные</a></li>
+</ul>

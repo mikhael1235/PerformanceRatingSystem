@@ -1,0 +1,28 @@
+﻿@model PerformanceRatingSystem.Application.Dtos.DepartmentDto
+
+@{
+    ViewData["Title"] = "Удаление департамента";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Удаление департамента</h2>
+
+<h3>Вы уверены, что хотите удалить следующий департамент?</h3>
+<div>
+    <h4>Департамент</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="DepartmentId" /> 
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-controller="Departments" asp-action="Index" class="btn btn-default">Вернуться к списку</a>
+    </form>
+</div>

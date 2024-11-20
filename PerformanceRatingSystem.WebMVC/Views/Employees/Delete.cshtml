@@ -1,0 +1,40 @@
+﻿@model PerformanceRatingSystem.Application.Dtos.EmployeeDto
+
+@{
+    ViewData["Title"] = "Удаление работника";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Удаление работника</h2>
+
+<h3>Вы уверены, что хотите удалить следующего работника?</h3>
+<div>
+    <h4>Работник</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FullName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FullName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Position)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Position)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Department)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Department.Name) 
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="EmployeeId" /> 
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-controller="Employees" asp-action="Index" class="btn btn-default">Вернуться к списку</a>
+    </form>
+</div>

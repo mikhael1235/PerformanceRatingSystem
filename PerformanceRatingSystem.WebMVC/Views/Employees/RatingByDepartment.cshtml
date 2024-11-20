@@ -1,0 +1,60 @@
+﻿@model IEnumerable<PerformanceRatingSystem.Application.Dtos.EmployeeWithResultDto>
+@{
+    Layout = "_Layout";
+}
+
+<h2>Рейтинг сотрудников определенного отдела</h2>
+
+<form method="get">
+    <div class="form-row align-items-end">
+        <div class="col-auto">
+            <label for="searchQuarter">Квартал</label>
+            <select id="searchQuarter" name="searchQuarter" class="form-control">
+                <option value="">-- Выберите квартал --</option>
+                <option value="1">январь-март</option>
+                <option value="2">апрель-июль</option>
+                <option value="3">август-октябрь</option>
+                <option value="4">ноябрь-декабрь</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label for="searchYear">Год</label>
+            <input type="number" id="searchYear" name="searchYear" class="form-control" min="1900" max="9999" placeholder="Год">
+        </div>
+        <div class="col-auto">
+            <label for="searchDepartment">Отдел</label>
+            <select id="searchDepartment" name="searchDepartment" class="form-control" asp-items="ViewBag.DepartmentId">
+                <option value="">-- Выберите отдел --</option>
+            </select>
+        </div>
+        <br />
+        <div class="col-auto">
+            <button type="submit" class="btn btn-secondary">Найти</button>
+        </div>
+    </div>
+</form>
+<br />
+<table class="table">
+    <thead>
+        <tr>
+            <th>Место</th>
+            <th>Результат</th>
+            <th>Сотрудник</th>
+            <th>Год</th>
+            <th>Квартал</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Count(); i++)
+        {
+            var result = Model.ElementAt(i);
+            <tr>
+                <td>@(i+1)</td>
+                <td>@result.Value</td>
+                <td>@result.FullName</td>
+                <td>@result.Year</td>
+                <td>@result.Quarter</td>
+            </tr>
+        }
+    </tbody>
+</table>

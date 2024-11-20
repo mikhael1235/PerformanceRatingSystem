@@ -1,0 +1,60 @@
+﻿@model PerformanceRatingSystem.Application.Dtos.PlannedPerformanceValueForUpdateDto
+@{
+    ViewBag.Title = "Редактирование планового показателя производительности";
+}
+
+<h2>Редактировать плановый показатель производительности</h2>
+
+<form asp-action="Edit" asp-controller="PlannedPerformanceValues">
+    <h4>Плановый показатель производительности</h4>
+    <hr />
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="form-group">
+        <input type="hidden" asp-for="Id" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IndicatorType" class="control-label col-md-2">Тип индикатора</label>
+        <input type="text" asp-for="IndicatorType" class="form-control" />
+        <span asp-validation-for="IndicatorType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Value" class="control-label col-md-2">Значение</label>
+        <input type="number" asp-for="Value" class="form-control" step="0.01" />
+        <span asp-validation-for="Value" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Year" class="control-label col-md-2">Год</label>
+        <input type="number" asp-for="Year" class="form-control" />
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Quarter" class="control-label col-md-2">Квартал</label>
+        <input type="number" asp-for="Quarter" class="form-control" min="1" max="4" />
+        <span asp-validation-for="Quarter" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IndicatorId" class="control-label col-md-2">Индикатор</label>
+        <select asp-for="IndicatorId" class="form-control" asp-items="ViewBag.IndicatorId"></select>
+        <span asp-validation-for="IndicatorId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Сохранить" class="btn btn-warning" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index" class="btn btn-sm btn-primary">Вернуться</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

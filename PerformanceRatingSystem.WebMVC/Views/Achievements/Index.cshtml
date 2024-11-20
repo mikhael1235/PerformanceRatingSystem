@@ -1,0 +1,32 @@
+﻿@model IEnumerable<PerformanceRatingSystem.Application.Dtos.AchievementDto>
+@{
+    Layout = "_Layout";
+}
+
+<h2>Достижения</h2>
+
+<a class="btn btn-primary" asp-controller="Achievements" asp-action="Create">Создать новое достижение</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Описание</th>
+            <th>Дата достижения</th>
+            <th>Сотрудник</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var achievement in Model)
+        {
+            <tr>
+                <td>@achievement.Description</td>
+                <td>@achievement.DateAchieved.ToShortDateString()</td> 
+                <td>@achievement.Employee?.FullName</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-controller="Achievements" asp-action="Details" asp-route-id="@achievement.AchievementId">Подробнее</a> |
+                    <a class="btn btn-sm btn-danger" asp-controller="Achievements" asp-action="Delete" asp-route-id="@achievement.AchievementId">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

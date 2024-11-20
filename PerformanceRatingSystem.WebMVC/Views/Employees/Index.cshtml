@@ -1,0 +1,33 @@
+﻿@model IEnumerable<PerformanceRatingSystem.Application.Dtos.EmployeeDto>
+@{
+    Layout = "_Layout";
+}
+
+<h2>Сотрудники</h2>
+
+<a class="btn btn-primary" asp-controller="Employees" asp-action="Create">Создать нового сотрудника</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Должность</th>
+            <th>Отдел</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in Model)
+        {
+            <tr>
+                <td>@employee.FullName</td>
+                <td>@employee.Position</td>
+                <td>@employee.Department?.Name</td> 
+                <td>
+                    <a class="btn btn-sm btn-primary" asp-controller="Employees" asp-action="Details" asp-route-id="@employee.EmployeeId">Подробнее</a> |
+                    <a class="btn btn-sm btn-danger" asp-controller="Employees" asp-action="Delete" asp-route-id="@employee.EmployeeId">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
