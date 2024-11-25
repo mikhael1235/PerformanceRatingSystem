@@ -7,6 +7,7 @@ using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
 using PerformanceRatingSystem.Web.Controllers;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Tests.ControllersTests;
 
@@ -25,14 +26,14 @@ public class DepartmentPerformanceIndicatorControllerTests
     public async Task Get_ReturnsListOfDepartmentPerformanceIndicators()
     {
         // Arrange
-        var departmentPerformanceIndicators = new List<DepartmentPerformanceIndicatorDto> { new(), new() };
-
+        var departmentPerformanceIndicators = new PagedList<DepartmentPerformanceIndicatorDto>([new(), new()], 2, 1, 2);
+        DepartmentPerformanceIndicatorParameters parameters = new();
         _mediatorMock
-            .Setup(m => m.Send(new GetDepartmentPerformanceIndicatorsQuery(), CancellationToken.None))
+            .Setup(m => m.Send(new GetDepartmentPerformanceIndicatorsQuery(parameters), CancellationToken.None))
             .ReturnsAsync(departmentPerformanceIndicators);
 
         // Act
-        var result = await _controller.Get();
+        var result = await _controller.Get(parameters);
 
         // Assert
         result.Should().NotBeNull();
@@ -45,7 +46,7 @@ public class DepartmentPerformanceIndicatorControllerTests
         value.Should().HaveCount(2);
         value.Should().BeEquivalentTo(departmentPerformanceIndicators);
 
-        _mediatorMock.Verify(m => m.Send(new GetDepartmentPerformanceIndicatorsQuery(), CancellationToken.None), Times.Once);
+        _mediatorMock.Verify(m => m.Send(new GetDepartmentPerformanceIndicatorsQuery(parameters), CancellationToken.None), Times.Once);
     }
 
     [Fact]

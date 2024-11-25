@@ -9,7 +9,7 @@
     <div class="form-row align-items-end">
         <div class="col-auto">
             <label for="searchQuarter">Квартал</label>
-            <select id="searchQuarter" name="searchQuarter" class="form-control">
+            <select id="searchQuarter" name="searchQuarter" class="form-control" value="@ViewData["SearchQuarter"]">
                 <option value="">-- Выберите квартал --</option>
                 <option value="1">январь-март</option>
                 <option value="2">апрель-июль</option>
@@ -19,11 +19,11 @@
         </div>
         <div class="col-auto">
             <label for="searchYear">Год</label>
-            <input type="number" id="searchYear" name="searchYear" class="form-control" min="1900" max="9999" placeholder="Год">
+            <input type="number" id="searchYear" name="searchYear" value="@ViewData["SearchYear"]" class="form-control" min="1900" max="9999" placeholder="Год">
         </div>
         <div class="col-auto">
             <label for="searchDepartment">Отдел</label>
-            <select id="searchDepartment" name="searchDepartment" class="form-control" asp-items="ViewBag.DepartmentId">
+            <select id="searchDepartment" name="searchDepartment" value="@ViewData["SearchDepartment"]" class="form-control" asp-items="ViewBag.DepartmentId">
                 <option value="">-- Выберите отдел --</option>
             </select>
         </div>

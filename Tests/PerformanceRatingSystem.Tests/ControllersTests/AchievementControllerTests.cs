@@ -7,6 +7,7 @@ using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
 using PerformanceRatingSystem.Web.Controllers;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Tests.ControllersTests;
 
@@ -25,14 +26,14 @@ public class AchievementControllerTests
     public async Task Get_ReturnsListOfAchievements()
     {
         // Arrange
-        var achievements = new List<AchievementDto> { new(), new() };
-
+        var achievements = new PagedList<AchievementDto> ( [new(), new()],2,1,2);
+        AchievementParameters parameters = new();
         _mediatorMock
-            .Setup(m => m.Send(new GetAchievementsQuery(), CancellationToken.None))
+            .Setup(m => m.Send(new GetAchievementsQuery(parameters), CancellationToken.None))
             .ReturnsAsync(achievements);
 
         // Act
-        var result = await _controller.Get();
+        var result = await _controller.Get(parameters);
 
         // Assert
         result.Should().NotBeNull();
@@ -45,7 +46,7 @@ public class AchievementControllerTests
         value.Should().HaveCount(2);
         value.Should().BeEquivalentTo(achievements);
 
-        _mediatorMock.Verify(m => m.Send(new GetAchievementsQuery(), CancellationToken.None), Times.Once);
+        _mediatorMock.Verify(m => m.Send(new GetAchievementsQuery(parameters), CancellationToken.None), Times.Once);
     }
 
     [Fact]

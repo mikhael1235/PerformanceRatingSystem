@@ -7,6 +7,7 @@ using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
 using PerformanceRatingSystem.Web.Controllers;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Tests.ControllersTests;
 
@@ -25,14 +26,14 @@ public class PlannedPerformanceValueControllerTests
     public async Task Get_ReturnsListOfPlannedPerformanceValues()
     {
         // Arrange
-        var plannedPerformanceValues = new List<PlannedPerformanceValueDto> { new(), new() };
-
+        var plannedPerformanceValues = new PagedList<PlannedPerformanceValueDto>([new(), new()], 2, 1, 2);
+        PlannedPerformanceValueParameters parameters = new();
         _mediatorMock
-            .Setup(m => m.Send(new GetPlannedPerformanceValuesQuery(), CancellationToken.None))
+            .Setup(m => m.Send(new GetPlannedPerformanceValuesQuery(parameters), CancellationToken.None))
             .ReturnsAsync(plannedPerformanceValues);
 
         // Act
-        var result = await _controller.Get();
+        var result = await _controller.Get(parameters);
 
         // Assert
         result.Should().NotBeNull();
@@ -45,7 +46,7 @@ public class PlannedPerformanceValueControllerTests
         value.Should().HaveCount(2);
         value.Should().BeEquivalentTo(plannedPerformanceValues);
 
-        _mediatorMock.Verify(m => m.Send(new GetPlannedPerformanceValuesQuery(), CancellationToken.None), Times.Once);
+        _mediatorMock.Verify(m => m.Send(new GetPlannedPerformanceValuesQuery(parameters), CancellationToken.None), Times.Once);
     }
 
     [Fact]

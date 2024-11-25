@@ -5,6 +5,9 @@ using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using PerformanceRatingSystem.Domain.RequestFeatures;
+using System.Linq.Dynamic.Core;
+using System.Text.Json;
 
 namespace PerformanceRatingSystem.WebMVC.Controllers;
 
@@ -14,13 +17,22 @@ public class ActualPerformanceResultsController(IMediator mediator) : Controller
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
- 
     [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Any, NoStore = false)]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] ActualPerformanceResultParameters parameters)
     {
-        var actualPerformanceResults = await _mediator.Send(new GetActualPerformanceResultsQuery());
+        var departments = await _mediator.Send(new GetDepartmentsQuery(new()));
 
-        return View(actualPerformanceResults);
+        if (departments != null)
+            ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "Name");
+
+        ViewData["SearchQuarter"] = parameters.SearchQuarter;
+        ViewData["SearchYear"] = parameters.SearchYear;
+        ViewData["SearchDepartment"] = parameters.SearchDepartment;
+
+        var pagedResult = await _mediator.Send(new GetActualPerformanceResultsQuery(parameters));
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.MetaData));
+
+        return View(pagedResult);
     }
 
     [HttpGet]
@@ -43,7 +55,7 @@ public class ActualPerformanceResultsController(IMediator mediator) : Controller
  
     {
  
-        var indicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery());
+        var indicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery(new()));
  
 
  
@@ -109,7 +121,7 @@ public class ActualPerformanceResultsController(IMediator mediator) : Controller
  
 
  
-        var indicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery());
+        var indicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery(new()));
  
 
  

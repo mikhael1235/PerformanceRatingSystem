@@ -8,6 +8,7 @@ using Azure.Core;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PerformanceRatingSystem.Domain.RequestFeatures;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.Json;
 namespace PerformanceRatingSystem.WebMVC.Controllers;
 
 [Authorize]
@@ -21,11 +22,12 @@ public class DepartmentsController : Controller
 
     [HttpGet]
     [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Any, NoStore = false)]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] DepartmentParameters parameters)
     {
-        var departments = await _mediator.Send(new GetDepartmentsQuery());
-
-        return View(departments);
+        var pagedResult = await _mediator.Send(new GetDepartmentsQuery(parameters));
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.MetaData));
+        ViewData["SearchName"] = parameters.SearchName;
+        return View(pagedResult);
     }
 
     [HttpGet]
@@ -45,6 +47,8 @@ public class DepartmentsController : Controller
     public async Task<IActionResult> Rating([FromQuery] ActualPerformanceResultParameters resultParameters)
     {
         var departments = await _mediator.Send(new GetDepartmentsByResultsQuery(resultParameters));
+        ViewData["SearchQuarter"] = resultParameters.SearchQuarter;
+        ViewData["SearchYear"] = resultParameters.SearchYear;
         if (departments == null)
         {
             return View();

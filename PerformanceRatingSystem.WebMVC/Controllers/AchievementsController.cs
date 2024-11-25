@@ -7,6 +7,10 @@ using PerformanceRatingSystem.Application.Requests.Commands;
  
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using PerformanceRatingSystem.Domain.RequestFeatures;
+using System.Linq.Dynamic.Core;
+using System.Reflection.PortableExecutable;
+using System.Text.Json;
 
 namespace PerformanceRatingSystem.WebMVC.Controllers;
 
@@ -23,11 +27,12 @@ public class AchievementsController : Controller
     [HttpGet]
  
     [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Any, NoStore = false)]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] AchievementParameters parameters)
     {
-        var achievements = await _mediator.Send(new GetAchievementsQuery());
-
-        return View(achievements);
+        var pagedResult = await _mediator.Send(new GetAchievementsQuery(parameters));
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.MetaData));
+        ViewData["SearchDescription"] = parameters.SearchDescription;
+        return View(pagedResult);
     }
 
     [HttpGet]
@@ -50,7 +55,7 @@ public class AchievementsController : Controller
  
     {
  
-        var employees = await _mediator.Send(new GetEmployeesQuery());
+        var employees = await _mediator.Send(new GetEmployeesQuery(new()));
  
 
  
@@ -113,7 +118,7 @@ public class AchievementsController : Controller
  
 
  
-        var employees = await _mediator.Send(new GetEmployeesQuery());
+        var employees = await _mediator.Send(new GetEmployeesQuery(new()));
  
         ViewData["EmployeeId"] = new SelectList(employees, "EmployeeId", "FullName");
  

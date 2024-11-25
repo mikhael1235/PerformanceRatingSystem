@@ -1,10 +1,11 @@
 using PerformanceRatingSystem.Domain.Entities;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Domain.Abstractions;
 
 public interface IEmployeeRepository 
 {
-	Task<IEnumerable<Employee>> Get(bool trackChanges);
+    Task<PagedList<Employee>> Get(EmployeeParameters employeeParameters, bool trackChanges);
 	Task<Employee?> GetById(Guid id, bool trackChanges);
     Task Create(Employee entity);
     void Delete(Employee entity);

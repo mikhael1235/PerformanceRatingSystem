@@ -3,6 +3,7 @@
 using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Web.Controllers;
 
@@ -18,9 +19,9 @@ public class AchievementController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] AchievementParameters parameters)
     {
-        var achievements = await _mediator.Send(new GetAchievementsQuery());
+        var achievements = await _mediator.Send(new GetAchievementsQuery(parameters));
 
         return Ok(achievements);
     }

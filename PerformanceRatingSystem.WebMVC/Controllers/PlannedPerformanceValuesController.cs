@@ -6,6 +6,9 @@ using PerformanceRatingSystem.Application.Requests.Commands;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PerformanceRatingSystem.Application.RequestHandlers.QueryHandlers;
 using Microsoft.AspNetCore.Authorization;
+using PerformanceRatingSystem.Domain.RequestFeatures;
+using System.Linq.Dynamic.Core;
+using System.Text.Json;
 
 namespace PerformanceRatingSystem.WebMVC.Controllers;
 
@@ -16,11 +19,13 @@ public class PlannedPerformanceValuesController(IMediator mediator) : Controller
 
     [HttpGet]
     [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Any, NoStore = false)]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] PlannedPerformanceValueParameters parameters)
     {
-        var plannedPerformanceValues = await _mediator.Send(new GetPlannedPerformanceValuesQuery());
-
-        return View(plannedPerformanceValues);
+        var pagedResult = await _mediator.Send(new GetPlannedPerformanceValuesQuery(parameters));
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.MetaData));
+        ViewData["SearchQuarter"] = parameters.SearchQuarter;
+        ViewData["SearchYear"] = parameters.SearchYear;
+        return View(pagedResult);
     }
 
     [HttpGet]
@@ -39,7 +44,7 @@ public class PlannedPerformanceValuesController(IMediator mediator) : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var indicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery());
+        var indicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery(new()));
 
         if (indicators != null)
             ViewData["IndicatorId"] = new SelectList(indicators, "IndicatorId", "Name");
@@ -80,7 +85,7 @@ public class PlannedPerformanceValuesController(IMediator mediator) : Controller
             Year = isEntityFound.Year,
         };
 
-        var indicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery());
+        var indicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery(new()));
 
         if (indicators != null)
             ViewData["IndicatorId"] = new SelectList(indicators, "IndicatorId", "Name");

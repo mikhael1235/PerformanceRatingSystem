@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PerformanceRatingSystem.Domain.Entities;
 using PerformanceRatingSystem.Domain.Abstractions;
+using PerformanceRatingSystem.Domain.RequestFeatures;
+using PerformanceRatingSystem.Infrastructure.Extensions;
 
 namespace PerformanceRatingSystem.Infrastructure.Repositories;
 
@@ -10,10 +12,30 @@ public class DepartmentRepository(EmployeePerformanceContext dbContext) : IDepar
 
     public async Task Create(Department entity) => await _dbContext.Departments.AddAsync(entity);
 
-    public async Task<IEnumerable<Department>> Get(bool trackChanges) =>
-        await (!trackChanges 
-            ? _dbContext.Departments.Include(x => x.Employees).AsNoTracking() 
-            : _dbContext.Departments.Include(x => x.Employees)).ToListAsync();
+    public async Task<PagedList<Department>> Get(DepartmentParameters departmentParameters, bool trackChanges)
+    {
+        IQueryable<Department> query = _dbContext.Departments;
+
+        if (!trackChanges)
+            query = query.AsNoTracking();
+
+        query = query.SearchByName(departmentParameters.SearchName);
+
+        var count = await query.CountAsync();
+
+        var departments = await query
+            .Sort(departmentParameters.OrderBy)
+            .Skip((departmentParameters.PageNumber - 1) * departmentParameters.PageSize)
+            .Take(departmentParameters.PageSize)
+            .ToListAsync();
+
+        return new PagedList<Department>(
+            departments,
+            count,
+            departmentParameters.PageNumber,
+            departmentParameters.PageSize
+        );
+    }
 
     public async Task<Department?> GetById(Guid id, bool trackChanges) =>
         await (!trackChanges ?

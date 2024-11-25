@@ -8,14 +8,14 @@ using PerformanceRatingSystem.Domain.Entities;
 
 namespace PerformanceRatingSystem.Application.RequestHandlers.QueryHandlers;
 
-public class GetDepartmentsByResultsQueryHandler(IActualPerformanceResultRepository repository, IMapper mapper) : IRequestHandler<GetDepartmentsByResultsQuery, IEnumerable<DepartmentWithResultDto>>
+public class GetDepartmentsByResultsQueryHandler(IActualPerformanceResultRepository repository, IMapper mapper) : IRequestHandler<GetDepartmentsByResultsQuery, PagedList<DepartmentWithResultDto>>
 {
 	private readonly IActualPerformanceResultRepository _repository = repository;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<IEnumerable<DepartmentWithResultDto>> Handle(GetDepartmentsByResultsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedList<DepartmentWithResultDto>> Handle(GetDepartmentsByResultsQuery request, CancellationToken cancellationToken)
     {
-        var entitiesWithMetaData = await _repository.GetActualPerformanceResultsByDepartmentAsync(
+        var entitiesWithMetaData = await _repository.Get(
            request.ActualPerformanceResultParameters,
            false
        );
@@ -31,6 +31,13 @@ public class GetDepartmentsByResultsQueryHandler(IActualPerformanceResultReposit
             })
             .OrderByDescending(x => x.Value);
 
-        return entitiesDto;
+        var employeesDtoWithMetaData = new PagedList<DepartmentWithResultDto>(
+            entitiesDto.ToList(),
+            entitiesWithMetaData.MetaData.TotalCount,
+            request.ActualPerformanceResultParameters.PageNumber,
+            request.ActualPerformanceResultParameters.PageSize
+        );
+
+        return employeesDtoWithMetaData;
     }
 }

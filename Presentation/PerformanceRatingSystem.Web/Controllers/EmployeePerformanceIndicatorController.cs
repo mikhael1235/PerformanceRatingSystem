@@ -3,6 +3,7 @@
 using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Web.Controllers;
 
@@ -18,9 +19,9 @@ public class EmployeePerformanceIndicatorController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] EmployeePerformanceIndicatorParameters parameters)
     {
-        var employeePerformanceIndicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery());
+        var employeePerformanceIndicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery(parameters));
 
         return Ok(employeePerformanceIndicators);
     }

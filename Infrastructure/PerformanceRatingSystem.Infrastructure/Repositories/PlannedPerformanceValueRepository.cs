@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PerformanceRatingSystem.Domain.Entities;
 using PerformanceRatingSystem.Domain.Abstractions;
+using PerformanceRatingSystem.Domain.RequestFeatures;
+using PerformanceRatingSystem.Infrastructure.Extensions;
 
 namespace PerformanceRatingSystem.Infrastructure.Repositories;
 
@@ -10,10 +12,34 @@ public class PlannedPerformanceValueRepository(EmployeePerformanceContext dbCont
 
     public async Task Create(PlannedPerformanceValue entity) => await _dbContext.PlannedPerformanceValues.AddAsync(entity);
 
-    public async Task<IEnumerable<PlannedPerformanceValue>> Get(bool trackChanges) =>
-        await (!trackChanges 
-            ? _dbContext.PlannedPerformanceValues.Include(e => e.Indicator).AsNoTracking() 
-            : _dbContext.PlannedPerformanceValues.Include(e => e.Indicator)).ToListAsync();
+    public async Task<PagedList<PlannedPerformanceValue>> Get(
+        PlannedPerformanceValueParameters productParameters,
+        bool trackChanges)
+    {
+        IQueryable<PlannedPerformanceValue> query = _dbContext.PlannedPerformanceValues.Include(e => e.Indicator.Department);
+
+        if (!trackChanges)
+            query = query.AsNoTracking();
+
+        var newquery = query
+               .Search(productParameters.SearchQuarter, productParameters.SearchYear);
+
+
+        var results =
+            await newquery
+                .Sort(productParameters.OrderBy)
+                .Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
+                .Take(productParameters.PageSize)
+                .ToListAsync();
+
+        var count = await newquery.CountAsync();
+        return new PagedList<PlannedPerformanceValue>(
+            results,
+            count,
+            productParameters.PageNumber,
+            productParameters.PageSize
+      );
+    }
 
     public async Task<PlannedPerformanceValue?> GetById(Guid id, bool trackChanges) =>
         await (!trackChanges ?

@@ -23,7 +23,7 @@ public static class ServiceExtensions
     public static void ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<EmployeePerformanceContext>(opts =>
-            opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b =>
+            opts.UseSqlServer(configuration.GetConnectionString("MyConnection"), b =>
                 b.MigrationsAssembly("PerformanceRatingSystem.Infrastructure")));
     }
 
