@@ -15,31 +15,32 @@ public class ActualPerformanceResultRepository(EmployeePerformanceContext dbCont
     public async Task Create(ActualPerformanceResult entity) => await _dbContext.ActualPerformanceResults.AddAsync(entity);
 
     public async Task<PagedList<ActualPerformanceResult>> Get(
-        ActualPerformanceResultParameters productParameters,
-        bool trackChanges)
+    ActualPerformanceResultParameters productParameters,
+    bool trackChanges)
     {
-
-        IQueryable<ActualPerformanceResult> query = _dbContext.ActualPerformanceResults.Include(e => e.Indicator.Employee).Include(e => e.Indicator.Employee.Department);
+        IQueryable<ActualPerformanceResult> query = _dbContext.ActualPerformanceResults
+            .Include(e => e.Indicator.Employee)
+            .Include(e => e.Indicator.Employee.Department);
 
         if (!trackChanges)
             query = query.AsNoTracking();
 
-        var newquery = query
-               .Search(productParameters.SearchQuarter, productParameters.SearchYear, productParameters.SearchDepartment);
+        query = query
+            .Search(productParameters.SearchQuarter, productParameters.SearchYear, productParameters.SearchDepartment) // Предполагаю, что здесь ваш метод поиска
+            .Sort(productParameters.OrderBy); 
+        var count = await query.CountAsync();
 
+        var results = await query
+            .Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
+            .Take(productParameters.PageSize)
+            .ToListAsync();
 
-        var results =
-            await newquery
-                .Sort(productParameters.OrderBy)
-                .ToListAsync();
-
-        var count = await newquery.CountAsync();
         return new PagedList<ActualPerformanceResult>(
             results,
             count,
             productParameters.PageNumber,
             productParameters.PageSize
-      );
+        );
     }
 
     public async Task<ActualPerformanceResult?> GetById(Guid id, bool trackChanges) =>

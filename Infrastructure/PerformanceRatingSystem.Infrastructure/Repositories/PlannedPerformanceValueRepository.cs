@@ -28,6 +28,8 @@ public class PlannedPerformanceValueRepository(EmployeePerformanceContext dbCont
         var results =
             await newquery
                 .Sort(productParameters.OrderBy)
+                .Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
+                .Take(productParameters.PageSize)
                 .ToListAsync();
 
         var count = await newquery.CountAsync();
