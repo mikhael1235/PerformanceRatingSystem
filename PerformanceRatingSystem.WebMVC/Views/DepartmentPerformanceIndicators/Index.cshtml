@@ -1,10 +1,20 @@
-﻿@model IEnumerable<PerformanceRatingSystem.Application.Dtos.DepartmentPerformanceIndicatorDto>
+﻿@model PerformanceRatingSystem.Domain.RequestFeatures.PagedList<PerformanceRatingSystem.Application.Dtos.DepartmentPerformanceIndicatorDto>
 @{
     Layout = "_Layout";
 }
 
 <h2>Показатели производительности отдела</h2>
-
+<form method="get">
+    <div class="form-row align-items-end">
+        <div class="col-auto">
+            <label for="searchName">Название</label>
+            <input type="text" id="searchName" name="searchName" class="form-control" value="@ViewData["SearchName"]" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-secondary">Найти</button>
+        </div>
+    </div>
+</form>
 <a class="btn btn-primary"  asp-controller="DepartmentPerformanceIndicators" asp-action="Create">Создать новый показатель</a>
 <table class="table">
     <thead>
@@ -19,7 +29,7 @@
         {
             <tr>
                 <td>@indicator.Name</td>
-                <td>@indicator.Department?.Name</td> <!-- Отображаем название отдела -->
+                <td>@indicator.Department?.Name</td> 
                 <td>
                     <a class="btn btn-sm btn-primary" asp-controller="DepartmentPerformanceIndicators" asp-action="Details" asp-route-id="@indicator.IndicatorId">Подробнее</a> |
                     <a class="btn btn-sm btn-danger" asp-controller="DepartmentPerformanceIndicators" asp-action="Delete" asp-route-id="@indicator.IndicatorId">Удалить</a>
@@ -28,3 +38,49 @@
         }
     </tbody>
 </table>
+<div class="pagination">
+    @if (Model.MetaData.HasPrevious)
+    {
+        <a class="btn btn-primary" asp-action="Index" asp-route-PageNumber="@(Model.MetaData.CurrentPage - 1)" asp-route-searchName="@ViewData["SearchName"]">Назад</a>
+    }
+
+    @if (Model.MetaData.CurrentPage > 3)
+    {
+        <a class="btn btn-primary" asp-action="Index" asp-route-PageNumber="1" asp-route-searchName="@ViewData["SearchName"]">1</a>
+        @if (Model.MetaData.CurrentPage > 4)
+        {
+            <span>...</span>
+        }
+    }
+
+    @{
+        var startPage = Math.Max(2, Model.MetaData.CurrentPage - 2);
+        var endPage = Math.Min(Model.MetaData.CurrentPage + 2, Model.MetaData.TotalPages - 1);
+    }
+
+    @for (int i = startPage; i <= endPage; i++)
+    {
+        if (i == Model.MetaData.CurrentPage)
+        {
+            <span class="btn btn-secondary disabled">@i</span>
+        }
+        else
+        {
+            <a class="btn btn-primary" asp-action="Index" asp-route-PageNumber="@i" asp-route-searchName="@ViewData["SearchName"]">@i</a>
+        }
+    }
+
+    @if (Model.MetaData.CurrentPage < Model.MetaData.TotalPages - 2)
+    {
+        @if (Model.MetaData.CurrentPage < Model.MetaData.TotalPages - 3)
+        {
+            <span>...</span>
+        }
+        <a class="btn btn-primary" asp-action="Index" asp-route-PageNumber="@Model.MetaData.TotalPages" asp-route-searchName="@ViewData["SearchName"]">@Model.MetaData.TotalPages</a>
+    }
+
+    @if (Model.MetaData.HasNext)
+    {
+        <a class="btn btn-primary" asp-action="Index" asp-route-PageNumber="@(Model.MetaData.CurrentPage + 1)" asp-route-searchName="@ViewData["SearchName"]">Вперед</a>
+    }
+</div>

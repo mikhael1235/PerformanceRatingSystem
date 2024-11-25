@@ -2,7 +2,7 @@
 
 public class AchievementParameters : RequestParameters
 {
-    public string? Description { get; set; }
+    public string? SearchDescription { get; set; }
     public AchievementParameters()
     {
         OrderBy = "dateAchieved";

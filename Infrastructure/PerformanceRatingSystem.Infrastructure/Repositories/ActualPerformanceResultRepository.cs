@@ -4,6 +4,7 @@ using PerformanceRatingSystem.Domain.Abstractions;
 using System.Linq;
 using PerformanceRatingSystem.Domain.RequestFeatures;
 using PerformanceRatingSystem.Infrastructure.Extensions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PerformanceRatingSystem.Infrastructure.Repositories;
 
@@ -13,33 +14,32 @@ public class ActualPerformanceResultRepository(EmployeePerformanceContext dbCont
 
     public async Task Create(ActualPerformanceResult entity) => await _dbContext.ActualPerformanceResults.AddAsync(entity);
 
-    public async Task<IEnumerable<ActualPerformanceResult>> Get(bool trackChanges) =>
-        await (!trackChanges 
-            ? _dbContext.ActualPerformanceResults.Include(e => e.Indicator).AsNoTracking() 
-            : _dbContext.ActualPerformanceResults.Include(e => e.Indicator)).ToListAsync();
-
-    public async Task<PagedList<ActualPerformanceResult>> GetActualPerformanceResultsByDepartmentAsync(
+    public async Task<PagedList<ActualPerformanceResult>> Get(
         ActualPerformanceResultParameters productParameters,
         bool trackChanges)
     {
+
+        IQueryable<ActualPerformanceResult> query = _dbContext.ActualPerformanceResults.Include(e => e.Indicator.Employee).Include(e => e.Indicator.Employee.Department);
+
+        if (!trackChanges)
+            query = query.AsNoTracking();
+
+        var newquery = query
+               .Search(productParameters.SearchQuarter, productParameters.SearchYear, productParameters.SearchDepartment);
+
+
         var results =
-            await (!trackChanges
-            ? _dbContext.ActualPerformanceResults.Include(e => e.Indicator.Employee).Include(e => e.Indicator.Employee.Department).AsNoTracking()
-            : _dbContext.ActualPerformanceResults.Include(e => e.Indicator.Employee).Include(e => e.Indicator.Employee.Department))
-                .Search(productParameters.SearchQuarter, productParameters.SearchYear, productParameters.SearchDepartment)
+            await newquery
                 .Sort(productParameters.OrderBy)
                 .ToListAsync();
 
-        var count = await (!trackChanges
-            ? _dbContext.ActualPerformanceResults.Include(e => e.Indicator).AsNoTracking()
-            : _dbContext.ActualPerformanceResults.Include(e => e.Indicator)).CountAsync();
-
+        var count = await newquery.CountAsync();
         return new PagedList<ActualPerformanceResult>(
             results,
             count,
             productParameters.PageNumber,
             productParameters.PageSize
-        );
+      );
     }
 
     public async Task<ActualPerformanceResult?> GetById(Guid id, bool trackChanges) =>

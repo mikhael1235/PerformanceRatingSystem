@@ -6,4 +6,4 @@ using PerformanceRatingSystem.Domain.RequestFeatures;
 namespace PerformanceRatingSystem.Application.Requests.Queries;
 
 public record GetDepartmentsByResultsQuery(ActualPerformanceResultParameters ActualPerformanceResultParameters) 
-    : IRequest<IEnumerable<DepartmentWithResultDto>>;
+    : IRequest<PagedList<DepartmentWithResultDto>>;

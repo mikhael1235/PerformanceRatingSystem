@@ -10,7 +10,6 @@ public class PlannedPerformanceValueParameters : RequestParameters
 {
     public string SearchQuarter { get; set; } = string.Empty;
     public string SearchYear { get; set; } = string.Empty;
-    public string SearchDepartment { get; set; } = string.Empty;
     public PlannedPerformanceValueParameters()
     {
         OrderBy = "value desc";

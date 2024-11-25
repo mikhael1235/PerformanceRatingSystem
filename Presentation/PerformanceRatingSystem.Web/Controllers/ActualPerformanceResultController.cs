@@ -3,6 +3,7 @@
 using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Web.Controllers;
 
@@ -18,9 +19,9 @@ public class ActualPerformanceResultController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] ActualPerformanceResultParameters parameters)
     {
-        var actualPerformanceResults = await _mediator.Send(new GetActualPerformanceResultsQuery());
+        var actualPerformanceResults = await _mediator.Send(new GetActualPerformanceResultsQuery(parameters));
 
         return Ok(actualPerformanceResults);
     }

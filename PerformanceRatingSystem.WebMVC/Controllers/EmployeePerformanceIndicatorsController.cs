@@ -5,6 +5,9 @@ using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using PerformanceRatingSystem.Domain.RequestFeatures;
+using System.Linq.Dynamic.Core;
+using System.Text.Json;
 
 namespace PerformanceRatingSystem.WebMVC.Controllers;
 
@@ -15,11 +18,12 @@ public class EmployeePerformanceIndicatorsController(IMediator mediator) : Contr
 
     [HttpGet]
     [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Any, NoStore = false)]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] EmployeePerformanceIndicatorParameters parameters)
     {
-        var employeePerformanceIndicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery());
-
-        return View(employeePerformanceIndicators);
+        var pagedResult = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery(parameters));
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.MetaData));
+        ViewData["SearchName"] = parameters.SearchName;
+        return View(pagedResult);
     }
 
     [HttpGet]
@@ -38,7 +42,7 @@ public class EmployeePerformanceIndicatorsController(IMediator mediator) : Contr
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var employees = await _mediator.Send(new GetEmployeesQuery());
+        var employees = await _mediator.Send(new GetEmployeesQuery(new()));
 
         if (employees != null)
             ViewData["EmployeeId"] = new SelectList(employees, "EmployeeId", "FullName");
@@ -77,7 +81,7 @@ public class EmployeePerformanceIndicatorsController(IMediator mediator) : Contr
             EmployeeId = isEntityFound.EmployeeId,
         };
 
-        var employees = await _mediator.Send(new GetEmployeesQuery());
+        var employees = await _mediator.Send(new GetEmployeesQuery(new()));
 
         if (employees != null)
             ViewData["EmployeeId"] = new SelectList(employees, "EmployeeId", "FullName");

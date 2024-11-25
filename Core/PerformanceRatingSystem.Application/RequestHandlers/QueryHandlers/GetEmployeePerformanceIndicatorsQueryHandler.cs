@@ -3,10 +3,11 @@ using AutoMapper;
 using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Domain.Abstractions;
 using PerformanceRatingSystem.Application.Requests.Queries;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Application.RequestHandlers.QueryHandlers;
 
-public class GetEmployeePerformanceIndicatorsQueryHandler : IRequestHandler<GetEmployeePerformanceIndicatorsQuery, IEnumerable<EmployeePerformanceIndicatorDto>>
+public class GetEmployeePerformanceIndicatorsQueryHandler : IRequestHandler<GetEmployeePerformanceIndicatorsQuery, PagedList<EmployeePerformanceIndicatorDto>>
 {
 	private readonly IEmployeePerformanceIndicatorRepository _repository;
 	private readonly IMapper _mapper;
@@ -17,6 +18,20 @@ public class GetEmployeePerformanceIndicatorsQueryHandler : IRequestHandler<GetE
 		_mapper = mapper;
 	}
 
-	public async Task<IEnumerable<EmployeePerformanceIndicatorDto>> Handle(GetEmployeePerformanceIndicatorsQuery request, CancellationToken cancellationToken) => 
-		_mapper.Map<IEnumerable<EmployeePerformanceIndicatorDto>>(await _repository.Get(trackChanges: false));
+	public async Task<PagedList<EmployeePerformanceIndicatorDto>> Handle(GetEmployeePerformanceIndicatorsQuery request, CancellationToken cancellationToken)
+	{
+        var employeesWithMetaData = await _repository.Get(request.EmployeePerformanceIndicatorParameters, trackChanges: false);
+
+        var employeeDtos = _mapper.Map<IEnumerable<EmployeePerformanceIndicatorDto>>(employeesWithMetaData);
+
+        var employeesDtoWithMetaData = new PagedList<EmployeePerformanceIndicatorDto>(
+            employeeDtos.ToList(),
+            employeesWithMetaData.MetaData.TotalCount,
+            request.EmployeePerformanceIndicatorParameters.PageNumber,
+            request.EmployeePerformanceIndicatorParameters.PageSize
+        );
+
+        return employeesDtoWithMetaData;
+    }
+	
 }
