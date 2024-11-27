@@ -7,6 +7,7 @@ using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
 using PerformanceRatingSystem.Web.Controllers;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Tests.ControllersTests;
 
@@ -25,14 +26,15 @@ public class DepartmentControllerTests
     public async Task Get_ReturnsListOfDepartments()
     {
         // Arrange
-        var departments = new List<DepartmentDto> { new(), new() };
+        var departments = new PagedList<DepartmentDto>([new(), new()], 2, 1, 2);
+        DepartmentParameters parameters = new();
 
         _mediatorMock
-            .Setup(m => m.Send(new GetDepartmentsQuery(), CancellationToken.None))
+            .Setup(m => m.Send(new GetDepartmentsQuery(parameters), CancellationToken.None))
             .ReturnsAsync(departments);
 
         // Act
-        var result = await _controller.Get();
+        var result = await _controller.Get(parameters);
 
         // Assert
         result.Should().NotBeNull();
@@ -45,7 +47,7 @@ public class DepartmentControllerTests
         value.Should().HaveCount(2);
         value.Should().BeEquivalentTo(departments);
 
-        _mediatorMock.Verify(m => m.Send(new GetDepartmentsQuery(), CancellationToken.None), Times.Once);
+        _mediatorMock.Verify(m => m.Send(new GetDepartmentsQuery(parameters), CancellationToken.None), Times.Once);
     }
 
     [Fact]

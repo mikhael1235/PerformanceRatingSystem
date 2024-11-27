@@ -5,8 +5,7 @@ namespace PerformanceRatingSystem.Domain.Abstractions;
 
 public interface IActualPerformanceResultRepository 
 {
-	Task<IEnumerable<ActualPerformanceResult>> Get(bool trackChanges);
-    Task<PagedList<ActualPerformanceResult>> GetActualPerformanceResultsByDepartmentAsync(
+    Task<PagedList<ActualPerformanceResult>> Get(
         ActualPerformanceResultParameters productParameters,
         bool trackChanges);
 

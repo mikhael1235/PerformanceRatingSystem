@@ -3,10 +3,11 @@ using AutoMapper;
 using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Domain.Abstractions;
 using PerformanceRatingSystem.Application.Requests.Queries;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Application.RequestHandlers.QueryHandlers;
 
-public class GetAchievementsQueryHandler : IRequestHandler<GetAchievementsQuery, IEnumerable<AchievementDto>>
+public class GetAchievementsQueryHandler : IRequestHandler<GetAchievementsQuery, PagedList<AchievementDto>>
 {
 	private readonly IAchievementRepository _repository;
 	private readonly IMapper _mapper;
@@ -17,6 +18,20 @@ public class GetAchievementsQueryHandler : IRequestHandler<GetAchievementsQuery,
 		_mapper = mapper;
 	}
 
-	public async Task<IEnumerable<AchievementDto>> Handle(GetAchievementsQuery request, CancellationToken cancellationToken) => 
-		_mapper.Map<IEnumerable<AchievementDto>>(await _repository.Get(trackChanges: false));
+	public async Task<PagedList<AchievementDto>> Handle(GetAchievementsQuery request, CancellationToken cancellationToken)
+	{
+        var employeesWithMetaData = await _repository.Get(request.AchievementParameters, trackChanges: false);
+
+        var employeeDtos = _mapper.Map<IEnumerable<AchievementDto>>(employeesWithMetaData);
+
+        var employeesDtoWithMetaData = new PagedList<AchievementDto>(
+            employeeDtos.ToList(),
+            employeesWithMetaData.MetaData.TotalCount,
+            request.AchievementParameters.PageNumber,
+            request.AchievementParameters.PageSize
+        );
+
+        return employeesDtoWithMetaData;
+    }
+		
 }

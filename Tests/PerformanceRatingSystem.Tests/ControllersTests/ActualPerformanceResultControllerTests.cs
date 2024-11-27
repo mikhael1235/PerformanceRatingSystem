@@ -7,6 +7,7 @@ using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
 using PerformanceRatingSystem.Web.Controllers;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Tests.ControllersTests;
 
@@ -25,14 +26,15 @@ public class ActualPerformanceResultControllerTests
     public async Task Get_ReturnsListOfActualPerformanceResults()
     {
         // Arrange
-        var actualPerformanceResults = new List<ActualPerformanceResultDto> { new(), new() };
+        var actualPerformanceResults = new PagedList<ActualPerformanceResultDto>([new(), new()], 2, 1, 5);
+        ActualPerformanceResultParameters parameters = new();
 
         _mediatorMock
-            .Setup(m => m.Send(new GetActualPerformanceResultsQuery(), CancellationToken.None))
+            .Setup(m => m.Send(new GetActualPerformanceResultsQuery(parameters), CancellationToken.None))
             .ReturnsAsync(actualPerformanceResults);
 
         // Act
-        var result = await _controller.Get();
+        var result = await _controller.Get(parameters);
 
         // Assert
         result.Should().NotBeNull();
@@ -45,7 +47,7 @@ public class ActualPerformanceResultControllerTests
         value.Should().HaveCount(2);
         value.Should().BeEquivalentTo(actualPerformanceResults);
 
-        _mediatorMock.Verify(m => m.Send(new GetActualPerformanceResultsQuery(), CancellationToken.None), Times.Once);
+        _mediatorMock.Verify(m => m.Send(new GetActualPerformanceResultsQuery(parameters), CancellationToken.None), Times.Once);
     }
 
     [Fact]

@@ -7,6 +7,7 @@ using PerformanceRatingSystem.Application.Dtos;
 using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
 using PerformanceRatingSystem.Web.Controllers;
+using PerformanceRatingSystem.Domain.RequestFeatures;
 
 namespace PerformanceRatingSystem.Tests.ControllersTests;
 
@@ -25,14 +26,14 @@ public class EmployeePerformanceIndicatorControllerTests
     public async Task Get_ReturnsListOfEmployeePerformanceIndicators()
     {
         // Arrange
-        var employeePerformanceIndicators = new List<EmployeePerformanceIndicatorDto> { new(), new() };
-
+        var employeePerformanceIndicators = new PagedList<EmployeePerformanceIndicatorDto>([new(), new()], 2, 1, 2);
+        EmployeePerformanceIndicatorParameters parameters = new();
         _mediatorMock
-            .Setup(m => m.Send(new GetEmployeePerformanceIndicatorsQuery(), CancellationToken.None))
+            .Setup(m => m.Send(new GetEmployeePerformanceIndicatorsQuery(parameters), CancellationToken.None))
             .ReturnsAsync(employeePerformanceIndicators);
 
         // Act
-        var result = await _controller.Get();
+        var result = await _controller.Get(parameters);
 
         // Assert
         result.Should().NotBeNull();
@@ -45,7 +46,7 @@ public class EmployeePerformanceIndicatorControllerTests
         value.Should().HaveCount(2);
         value.Should().BeEquivalentTo(employeePerformanceIndicators);
 
-        _mediatorMock.Verify(m => m.Send(new GetEmployeePerformanceIndicatorsQuery(), CancellationToken.None), Times.Once);
+        _mediatorMock.Verify(m => m.Send(new GetEmployeePerformanceIndicatorsQuery(parameters), CancellationToken.None), Times.Once);
     }
 
     [Fact]

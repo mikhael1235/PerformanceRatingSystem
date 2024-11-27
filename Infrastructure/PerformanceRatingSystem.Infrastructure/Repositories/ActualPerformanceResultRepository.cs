@@ -4,6 +4,7 @@ using PerformanceRatingSystem.Domain.Abstractions;
 using System.Linq;
 using PerformanceRatingSystem.Domain.RequestFeatures;
 using PerformanceRatingSystem.Infrastructure.Extensions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PerformanceRatingSystem.Infrastructure.Repositories;
 
@@ -13,26 +14,26 @@ public class ActualPerformanceResultRepository(EmployeePerformanceContext dbCont
 
     public async Task Create(ActualPerformanceResult entity) => await _dbContext.ActualPerformanceResults.AddAsync(entity);
 
-    public async Task<IEnumerable<ActualPerformanceResult>> Get(bool trackChanges) =>
-        await (!trackChanges 
-            ? _dbContext.ActualPerformanceResults.Include(e => e.Indicator).AsNoTracking() 
-            : _dbContext.ActualPerformanceResults.Include(e => e.Indicator)).ToListAsync();
-
-    public async Task<PagedList<ActualPerformanceResult>> GetActualPerformanceResultsByDepartmentAsync(
-        ActualPerformanceResultParameters productParameters,
-        bool trackChanges)
+    public async Task<PagedList<ActualPerformanceResult>> Get(
+    ActualPerformanceResultParameters productParameters,
+    bool trackChanges)
     {
-        var results =
-            await (!trackChanges
-            ? _dbContext.ActualPerformanceResults.Include(e => e.Indicator.Employee).Include(e => e.Indicator.Employee.Department).AsNoTracking()
-            : _dbContext.ActualPerformanceResults.Include(e => e.Indicator.Employee).Include(e => e.Indicator.Employee.Department))
-                .Search(productParameters.SearchQuarter, productParameters.SearchYear, productParameters.SearchDepartment)
-                .Sort(productParameters.OrderBy)
-                .ToListAsync();
+        IQueryable<ActualPerformanceResult> query = _dbContext.ActualPerformanceResults
+            .Include(e => e.Indicator.Employee)
+            .Include(e => e.Indicator.Employee.Department);
 
-        var count = await (!trackChanges
-            ? _dbContext.ActualPerformanceResults.Include(e => e.Indicator).AsNoTracking()
-            : _dbContext.ActualPerformanceResults.Include(e => e.Indicator)).CountAsync();
+        if (!trackChanges)
+            query = query.AsNoTracking();
+
+        query = query
+            .Search(productParameters.SearchQuarter, productParameters.SearchYear, productParameters.SearchDepartment) // Предполагаю, что здесь ваш метод поиска
+            .Sort(productParameters.OrderBy); 
+        var count = await query.CountAsync();
+
+        var results = await query
+            .Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
+            .Take(productParameters.PageSize)
+            .ToListAsync();
 
         return new PagedList<ActualPerformanceResult>(
             results,

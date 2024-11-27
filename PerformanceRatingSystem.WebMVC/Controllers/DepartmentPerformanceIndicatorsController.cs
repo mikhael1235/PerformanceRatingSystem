@@ -5,6 +5,9 @@ using PerformanceRatingSystem.Application.Requests.Queries;
 using PerformanceRatingSystem.Application.Requests.Commands;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using PerformanceRatingSystem.Domain.RequestFeatures;
+using System.Linq.Dynamic.Core;
+using System.Text.Json;
 
 namespace PerformanceRatingSystem.Web.Controllers;
 
@@ -20,11 +23,12 @@ public class DepartmentPerformanceIndicatorsController : Controller
 
     [HttpGet]
     [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Any, NoStore = false)]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] DepartmentPerformanceIndicatorParameters parameters)
     {
-        var departmentPerformanceIndicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery());
-
-        return View(departmentPerformanceIndicators);
+        var pagedResult = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery(parameters));
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.MetaData));
+        ViewData["SearchName"] = parameters.SearchName;
+        return View(pagedResult);
     }
 
     [HttpGet]
@@ -43,7 +47,7 @@ public class DepartmentPerformanceIndicatorsController : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var departments = await _mediator.Send(new GetDepartmentsQuery());
+        var departments = await _mediator.Send(new GetDepartmentsQuery(new()));
 
         if (departments != null)
             ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "Name");
@@ -81,7 +85,7 @@ public class DepartmentPerformanceIndicatorsController : Controller
             DepartmentId = isEntityFound.DepartmentId,
         };
 
-        var departments = await _mediator.Send(new GetDepartmentsQuery());
+        var departments = await _mediator.Send(new GetDepartmentsQuery(new()));
 
         if (departments != null)
             ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "Name");

@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace PerformanceRatingSystem.Domain.RequestFeatures;
 
-public class ActualPerformanceResultParameters : RequestParameters
+public class PlannedPerformanceValueParameters : RequestParameters
 {
     public string SearchQuarter { get; set; } = string.Empty;
     public string SearchYear { get; set; } = string.Empty;
-    public Guid? SearchDepartment { get; set; } = null;
-    public ActualPerformanceResultParameters()
+    public PlannedPerformanceValueParameters()
     {
         OrderBy = "value desc";
     }
