@@ -10,8 +10,14 @@ public static class RepositoryPlannedPerformanceValueExtensions
 {
     public static IQueryable<PlannedPerformanceValue> Search(this IQueryable<PlannedPerformanceValue> plannedValues, string searchQuarter, string searchYear)
     {
-        if (string.IsNullOrWhiteSpace(searchQuarter) || string.IsNullOrWhiteSpace(searchYear))
-            return plannedValues.Where(e => e.Year == 2012 && e.Quarter == 2);
+        if (string.IsNullOrWhiteSpace(searchQuarter) && string.IsNullOrWhiteSpace(searchYear))
+            return plannedValues;
+
+        if (string.IsNullOrWhiteSpace(searchYear))
+            return plannedValues.Where(x => x.Quarter == byte.Parse(searchQuarter));
+
+        if (string.IsNullOrWhiteSpace(searchQuarter))
+            return plannedValues.Where(x => x.Year == short.Parse(searchYear));
 
         return plannedValues.Where(e =>
             e.Quarter == byte.Parse(searchQuarter) &&

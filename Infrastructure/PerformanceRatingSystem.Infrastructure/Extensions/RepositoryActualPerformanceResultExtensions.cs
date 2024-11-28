@@ -10,13 +10,30 @@ public static class RepositoryActualPerformanceResultExtensions
 {
     public static IQueryable<ActualPerformanceResult> Search(this IQueryable<ActualPerformanceResult> products, string searchQuarter, string searchYear, Guid? searchDepartment)
     {
-        if (string.IsNullOrWhiteSpace(searchQuarter) || string.IsNullOrWhiteSpace(searchYear))
-            return products.Where(e => e.Year == 2012 && e.Quarter == 2);
-
         if(searchDepartment == null)
+        {
+            if (string.IsNullOrWhiteSpace(searchQuarter) && string.IsNullOrWhiteSpace(searchYear))
+                return plannedValues;
+
+            if (string.IsNullOrWhiteSpace(searchYear))
+                return plannedValues.Where(x => x.Quarter == byte.Parse(searchQuarter));
+
+            if (string.IsNullOrWhiteSpace(searchQuarter))
+                return plannedValues.Where(x => x.Year == short.Parse(searchYear));
+
             return products.Where(e =>
-            e.Quarter == byte.Parse(searchQuarter) &&
-            e.Year == short.Parse(searchYear));
+                e.Quarter == byte.Parse(searchQuarter) &&
+                e.Year == short.Parse(searchYear));
+        }
+
+        if (string.IsNullOrWhiteSpace(searchQuarter) && string.IsNullOrWhiteSpace(searchYear))
+            return plannedValues.Where(x => x.Indicator.Employee.DepartmentId == searchDepartment);
+
+        if (string.IsNullOrWhiteSpace(searchYear))
+            return plannedValues.Where(x => x.Quarter == byte.Parse(searchQuarter) && x.Indicator.Employee.DepartmentId == searchDepartment);
+
+        if (string.IsNullOrWhiteSpace(searchQuarter))
+            return plannedValues.Where(x => x.Year == short.Parse(searchYear) && x.Indicator.Employee.DepartmentId == searchDepartment);
 
         return products.Where(e => 
             e.Quarter == byte.Parse(searchQuarter) && 
