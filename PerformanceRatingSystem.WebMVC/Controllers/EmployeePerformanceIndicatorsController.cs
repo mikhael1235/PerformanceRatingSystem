@@ -42,7 +42,10 @@ public class EmployeePerformanceIndicatorsController(IMediator mediator) : Contr
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var employees = await _mediator.Send(new GetEmployeesQuery(new()));
+        var employees = await _mediator.Send(new GetEmployeesQuery(new()
+        {
+            PageSize = 500
+        }));
 
         if (employees != null)
             ViewData["EmployeeId"] = new SelectList(employees, "EmployeeId", "FullName");
@@ -81,7 +84,10 @@ public class EmployeePerformanceIndicatorsController(IMediator mediator) : Contr
             EmployeeId = isEntityFound.EmployeeId,
         };
 
-        var employees = await _mediator.Send(new GetEmployeesQuery(new()));
+        var employees = await _mediator.Send(new GetEmployeesQuery(new()
+        {
+            PageSize = 500
+        }));
 
         if (employees != null)
             ViewData["EmployeeId"] = new SelectList(employees, "EmployeeId", "FullName");

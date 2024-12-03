@@ -84,3 +84,5 @@
         <a class="btn btn-primary" asp-action="Index" asp-route-PageNumber="@(Model.MetaData.CurrentPage + 1)" asp-route-searchName="@ViewData["SearchName"]">Вперед</a>
     }
 </div>
+<span class="current-page">Текущая страница: @Model.MetaData.CurrentPage из @Model.MetaData.TotalPages</span>
+

@@ -44,7 +44,10 @@ public class PlannedPerformanceValuesController(IMediator mediator) : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var indicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery(new()));
+        var indicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery(new()
+        {
+            PageSize = 500
+        }));
 
         if (indicators != null)
             ViewData["IndicatorId"] = new SelectList(indicators, "IndicatorId", "Name");
@@ -85,7 +88,10 @@ public class PlannedPerformanceValuesController(IMediator mediator) : Controller
             Year = isEntityFound.Year,
         };
 
-        var indicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery(new()));
+        var indicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery(new()
+        {
+            PageSize = 500
+        }));
 
         if (indicators != null)
             ViewData["IndicatorId"] = new SelectList(indicators, "IndicatorId", "Name");

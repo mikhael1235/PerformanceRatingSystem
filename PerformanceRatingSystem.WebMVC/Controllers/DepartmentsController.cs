@@ -46,7 +46,9 @@ public class DepartmentsController : Controller
     [HttpGet]
     public async Task<IActionResult> Rating([FromQuery] ActualPerformanceResultParameters resultParameters)
     {
-        var departments = await _mediator.Send(new GetDepartmentsByResultsQuery(resultParameters));
+        var parameters = resultParameters;
+        parameters.PageSize = 500;
+        var departments = await _mediator.Send(new GetDepartmentsByResultsQuery(parameters));
         ViewData["SearchQuarter"] = resultParameters.SearchQuarter;
         ViewData["SearchYear"] = resultParameters.SearchYear;
         if (departments == null)

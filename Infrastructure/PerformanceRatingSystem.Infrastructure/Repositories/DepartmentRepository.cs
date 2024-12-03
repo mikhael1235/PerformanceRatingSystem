@@ -37,6 +37,19 @@ public class DepartmentRepository(EmployeePerformanceContext dbContext) : IDepar
         );
     }
 
+    public async Task<IEnumerable<Department>> GetAll(bool trackChanges)
+    {
+        IQueryable<Department> query = _dbContext.Departments;
+
+        if (!trackChanges)
+            query = query.AsNoTracking();
+
+        var departments = await query
+            .ToListAsync();
+
+        return departments;
+    }
+
     public async Task<Department?> GetById(Guid id, bool trackChanges) =>
         await (!trackChanges ?
             _dbContext.Departments.Include(x => x.Employees).AsNoTracking() :

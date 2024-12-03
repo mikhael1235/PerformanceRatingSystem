@@ -52,15 +52,14 @@ public class AchievementsController : Controller
 
     [HttpGet]
     public async Task<IActionResult> Create()
- 
     {
  
-        var employees = await _mediator.Send(new GetEmployeesQuery(new()));
- 
-
+        var employees = await _mediator.Send(new GetEmployeesQuery(new()
+        {
+            PageSize = 500
+        }));
  
         if (employees != null)
- 
             ViewData["EmployeeId"] = new SelectList(employees, "EmployeeId", "FullName");
  
 
@@ -118,8 +117,11 @@ public class AchievementsController : Controller
  
 
  
-        var employees = await _mediator.Send(new GetEmployeesQuery(new()));
- 
+        var employees = await _mediator.Send(new GetEmployeesQuery(new()
+        {
+            PageSize = 500
+        }));
+
         ViewData["EmployeeId"] = new SelectList(employees, "EmployeeId", "FullName");
  
 

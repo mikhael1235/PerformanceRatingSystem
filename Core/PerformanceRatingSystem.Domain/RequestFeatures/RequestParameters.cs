@@ -8,7 +8,7 @@ namespace PerformanceRatingSystem.Domain.RequestFeatures;
 
 public abstract class RequestParameters
 {
-    const int maxPageSize = 50;
+    const int maxPageSize = 500;
     private int _pageSize = 5;
 
     public int PageNumber { get; set; } = 1;
