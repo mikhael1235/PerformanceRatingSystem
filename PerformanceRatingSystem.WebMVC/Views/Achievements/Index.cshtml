@@ -47,18 +47,18 @@
         <a class="btn btn-primary" asp-action="Index" asp-route-PageNumber="@(Model.MetaData.CurrentPage - 1)" asp-route-searchPosition="@ViewData["SearchDescription"]">Назад</a>
     }
 
-    @if (Model.MetaData.CurrentPage > 3)
+    @if (Model.MetaData.CurrentPage > 2)
     {
         <a class="btn btn-primary" asp-action="Index" asp-route-PageNumber="1" asp-route-searchPosition="@ViewData["SearchDescription"]">1</a>
-        @if (Model.MetaData.CurrentPage > 4)
+        @if (Model.MetaData.CurrentPage > 3)
         {
             <span>...</span>
         }
     }
 
     @{
-        var startPage = Math.Max(2, Model.MetaData.CurrentPage - 2);
-        var endPage = Math.Min(Model.MetaData.CurrentPage + 2, Model.MetaData.TotalPages - 1);
+        var startPage = Math.Max(1, Model.MetaData.CurrentPage - 1);
+        var endPage = Math.Min(Model.MetaData.CurrentPage + 1, Model.MetaData.TotalPages );
     }
 
     @for (int i = startPage; i <= endPage; i++)
@@ -73,12 +73,13 @@
         }
     }
 
-    @if (Model.MetaData.CurrentPage < Model.MetaData.TotalPages - 2)
+    @if (Model.MetaData.CurrentPage < Model.MetaData.TotalPages - 1)
     {
-        @if (Model.MetaData.CurrentPage < Model.MetaData.TotalPages - 3)
+        @if (Model.MetaData.CurrentPage < Model.MetaData.TotalPages - 2)
         {
             <span>...</span>
         }
+      
         <a class="btn btn-primary" asp-action="Index" asp-route-PageNumber="@Model.MetaData.TotalPages" asp-route-searchPosition="@ViewData["SearchDescription"]">@Model.MetaData.TotalPages</a>
     }
 
@@ -88,5 +89,5 @@
     }
 
 </div>
-<span class="current-page">Текущая страница: @Model.MetaData.CurrentPage из @Model.MetaData.TotalPages</span>
+ 
 
