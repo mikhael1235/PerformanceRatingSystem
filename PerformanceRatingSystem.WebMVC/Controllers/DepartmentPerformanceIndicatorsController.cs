@@ -47,7 +47,7 @@ public class DepartmentPerformanceIndicatorsController : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var departments = await _mediator.Send(new GetDepartmentsQuery(new()));
+        var departments = await _mediator.Send(new GetAllDepartmentsQuery());
 
         if (departments != null)
             ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "Name");
@@ -85,7 +85,7 @@ public class DepartmentPerformanceIndicatorsController : Controller
             DepartmentId = isEntityFound.DepartmentId,
         };
 
-        var departments = await _mediator.Send(new GetDepartmentsQuery(new()));
+        var departments = await _mediator.Send(new GetAllDepartmentsQuery());
 
         if (departments != null)
             ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "Name");

@@ -31,7 +31,7 @@ public class EmployeesController(IMediator mediator) : Controller
     [HttpGet]
     public async Task<IActionResult> RatingByDepartment([FromQuery] ActualPerformanceResultParameters resultParameters)
     {
-        var departments = await _mediator.Send(new GetDepartmentsQuery(new()));
+        var departments = await _mediator.Send(new GetAllDepartmentsQuery());
 
         if (departments != null)
             ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "Name");
@@ -40,7 +40,9 @@ public class EmployeesController(IMediator mediator) : Controller
         ViewData["SearchYear"] = resultParameters.SearchYear; 
         ViewData["SearchDepartment"] = resultParameters.SearchDepartment;
 
-        var employees = await _mediator.Send(new GetEmployeesByResultsQuery(resultParameters));
+        var parameters = resultParameters;
+        parameters.PageSize = 500;
+        var employees = await _mediator.Send(new GetEmployeesByResultsQuery(parameters));
         if (employees == null)
         {
             return View();
@@ -65,7 +67,7 @@ public class EmployeesController(IMediator mediator) : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        var departments = await _mediator.Send(new GetDepartmentsQuery(new()));
+        var departments = await _mediator.Send(new GetAllDepartmentsQuery());
 
         if (departments != null) 
             ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "Name");
@@ -106,7 +108,7 @@ public class EmployeesController(IMediator mediator) : Controller
             Position = isEntityFound.Position,
         };
 
-        var departments = await _mediator.Send(new GetDepartmentsQuery(new()));
+        var departments = await _mediator.Send(new GetAllDepartmentsQuery());
 
         if (departments != null)
             ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "Name");

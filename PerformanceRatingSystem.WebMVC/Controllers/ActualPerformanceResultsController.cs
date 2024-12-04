@@ -20,7 +20,7 @@ public class ActualPerformanceResultsController(IMediator mediator) : Controller
     [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Any, NoStore = false)]
     public async Task<IActionResult> Index([FromQuery] ActualPerformanceResultParameters parameters)
     {
-        var departments = await _mediator.Send(new GetDepartmentsQuery(new()));
+        var departments = await _mediator.Send(new GetAllDepartmentsQuery());
 
         if (departments != null)
             ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "Name");
@@ -55,10 +55,13 @@ public class ActualPerformanceResultsController(IMediator mediator) : Controller
  
     {
  
-        var indicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery(new()));
- 
+        var indicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery(new()
+        {
+            PageSize = 500
+        }));
 
- 
+
+
         if (indicators != null)
  
             ViewData["IndicatorId"] = new SelectList(indicators, "IndicatorId", "Name");
@@ -121,10 +124,13 @@ public class ActualPerformanceResultsController(IMediator mediator) : Controller
  
 
  
-        var indicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery(new()));
- 
+        var indicators = await _mediator.Send(new GetEmployeePerformanceIndicatorsQuery(new()
+        {
+            PageSize = 500
+        }));
 
- 
+
+
         if (indicators != null)
  
             ViewData["IndicatorId"] = new SelectList(indicators, "IndicatorId", "Name");

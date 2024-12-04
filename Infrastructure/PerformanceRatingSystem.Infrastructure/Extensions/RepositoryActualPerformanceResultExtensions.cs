@@ -8,7 +8,7 @@ namespace PerformanceRatingSystem.Infrastructure.Extensions;
 
 public static class RepositoryActualPerformanceResultExtensions
 {
-    public static IQueryable<ActualPerformanceResult> Search(this IQueryable<ActualPerformanceResult> products, string searchQuarter, string searchYear, Guid? searchDepartment)
+    public static IQueryable<ActualPerformanceResult> Search(this IQueryable<ActualPerformanceResult> plannedValues, string searchQuarter, string searchYear, Guid? searchDepartment)
     {
         if(searchDepartment == null)
         {
@@ -21,7 +21,7 @@ public static class RepositoryActualPerformanceResultExtensions
             if (string.IsNullOrWhiteSpace(searchQuarter))
                 return plannedValues.Where(x => x.Year == short.Parse(searchYear));
 
-            return products.Where(e =>
+            return plannedValues.Where(e =>
                 e.Quarter == byte.Parse(searchQuarter) &&
                 e.Year == short.Parse(searchYear));
         }
@@ -35,7 +35,7 @@ public static class RepositoryActualPerformanceResultExtensions
         if (string.IsNullOrWhiteSpace(searchQuarter))
             return plannedValues.Where(x => x.Year == short.Parse(searchYear) && x.Indicator.Employee.DepartmentId == searchDepartment);
 
-        return products.Where(e => 
+        return plannedValues.Where(e => 
             e.Quarter == byte.Parse(searchQuarter) && 
             e.Year == short.Parse(searchYear) && 
             e.Indicator.Employee.DepartmentId == searchDepartment);
