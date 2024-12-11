@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Список отделов</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h2>Список отделов</h2>
+    <form name="departmentForm">
+        <input type="hidden" name="id" value="0" />
+        <div class="form-group col-md-5">
+            <label for="name">Название отдела:</label>
+            <input class="form-control" name="name" required />
+        </div>
+        <div class="panel-body">
+            <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
+            <a id="reset" class="btn btn-secondary">Сбросить</a>
+        </div>
+    </form>
+
+    <div class="form-group col-md-5">
+        <label for="filter">Фильтровать по названию:</label>
+        <input class="form-control" id="filter" placeholder="Введите название" />
+    </div>
+
+    <table class="table table-condensed table-striped col-md-6">
+        <thead>
+            <tr><th>Id</th><th>Название отдела</th><th></th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div class="pagination-container">
+        <button id="prevPage" class="btn btn-secondary">Предыдущая</button>
+        <button id="nextPage" class="btn btn-secondary">Следующая</button>
+    </div>
+
+    <div>2019 © Metanit.com</div>
+
+    <script>
+        let currentPage = 1;
+        const pageSize = 8;
+
+        document.getElementById("filter").addEventListener("input", () => {
+            currentPage = 1;
+            GetDepartments();
+        });
+
+        async function GetDepartments() {
+            const filterValue = document.getElementById("filter").value;
+            const response = await fetch(`/api/departments?pageNumber=${currentPage}&pageSize=${pageSize}&searchName=${filterValue}`, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok) {
+                const departments = await response.json();
+                renderDepartments(departments);
+            }
+        }
+
+        function renderDepartments(departments) {
+            let rows = document.querySelector("tbody");
+            rows.innerHTML = "";
+            departments.forEach(department => {
+                rows.append(row(department));
+            });
+        }
+
+        async function CreateDepartment(departmentName) {
+            const response = await fetch("/api/departments", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ name: departmentName })
+            });
+            if (response.ok) {
+                await GetDepartments();
+            }
+        }
+
+        async function EditDepartment(departmentId, departmentName) {
+            const response = await fetch(`/api/departments/${departmentId}`, {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ id: departmentId, name: departmentName })
+            });
+            if (response.ok) {
+                await GetDepartments();
+            }
+        }
+
+        async function DeleteDepartment(id) {
+            const response = await fetch(`/api/departments/${id}`, {
+                method: "DELETE",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok) {
+                await GetDepartments();
+            }
+        }
+
+        function reset() {
+            const form = document.forms["departmentForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+
+        function row(department) {
+            const tr = document.createElement("tr");
+            tr.setAttribute("data-rowid", department.departmentId);
+
+            const idTd = document.createElement("td");
+            idTd.append(department.departmentId);
+            tr.append(idTd);
+
+            const nameTd = document.createElement("td");
+            nameTd.append(department.name);
+            tr.append(nameTd);
+
+            const linksTd = document.createElement("td");
+
+            const editLink = document.createElement("a");
+            editLink.setAttribute("data-id", department.departmentId);
+            editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            editLink.append("Изменить");
+            editLink.addEventListener("click", e => {
+                e.preventDefault();
+                GetDepartment(department.departmentId);
+            });
+            linksTd.append(editLink);
+
+            const removeLink = document.createElement("a");
+            removeLink.setAttribute("data-id", department.departmentId);
+            removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            removeLink.append("Удалить");
+            removeLink.addEventListener("click", e => {
+                e.preventDefault();
+                DeleteDepartment(department.departmentId);
+            });
+
+            linksTd.append(removeLink);
+            tr.appendChild(linksTd);
+
+            return tr;
+        }
+
+        async function GetDepartment(id) {
+            const response = await fetch(`/api/departments/${id}`, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok) {
+                const department = await response.json();
+                const form = document.forms["departmentForm"];
+                form.elements["id"].value = department.departmentId;
+                form.elements["name"].value = department.name;
+            }
+        }
+
+        document.getElementById("reset").addEventListener("click", function (e) {
+            e.preventDefault();
+            reset();
+        });
+
+        document.forms["departmentForm"].addEventListener("submit", e => {
+            e.preventDefault();
+            const form = document.forms["departmentForm"];
+            const id = form.elements["id"].value;
+            const name = form.elements["name"].value;
+            if (id == 0)
+                CreateDepartment(name);
+            else
+                EditDepartment(id, name);
+        });
+
+        document.getElementById("prevPage").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                GetDepartments();
+            }
+        });
+
+        document.getElementById("nextPage").addEventListener("click", () => {
+            currentPage++;
+            GetDepartments();
+        });
+
+        GetDepartments();
+    </script>
+</body>
+</html>

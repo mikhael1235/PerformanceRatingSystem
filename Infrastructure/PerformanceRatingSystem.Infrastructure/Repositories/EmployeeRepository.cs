@@ -14,7 +14,7 @@ public class EmployeeRepository(EmployeePerformanceContext dbContext) : IEmploye
 
     public async Task<PagedList<Employee>> Get(EmployeeParameters employeeParameters, bool trackChanges)
     {
-        IQueryable<Employee> query = _dbContext.Employees.Include(x => x.Department);
+        IQueryable<Employee> query = _dbContext.Employees;
 
         if (!trackChanges)
             query = query.AsNoTracking();
@@ -39,8 +39,8 @@ public class EmployeeRepository(EmployeePerformanceContext dbContext) : IEmploye
 
     public async Task<Employee?> GetById(Guid id, bool trackChanges) =>
         await (!trackChanges ?
-            _dbContext.Employees.Include(e => e.Department).AsNoTracking() :
-            _dbContext.Employees.Include(e => e.Department)).SingleOrDefaultAsync(e => e.EmployeeId == id);
+            _dbContext.Employees.AsNoTracking() :
+            _dbContext.Employees).SingleOrDefaultAsync(e => e.EmployeeId == id);
 
     public void Delete(Employee entity) => _dbContext.Employees.Remove(entity);
 

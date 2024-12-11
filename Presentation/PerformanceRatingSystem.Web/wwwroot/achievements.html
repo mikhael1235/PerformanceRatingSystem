@@ -1,0 +1,245 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Список достижений</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <h2>Список достижений</h2>
+        <form name="achievementForm">
+            <input type="hidden" name="id" value="0" />
+            <div class="form-group col-md-6">
+                <label for="description">Описание:</label>
+                <input class="form-control" name="description" required />
+            </div>
+            <div class="form-group col-md-6">
+                <label for="dateAchieved">Дата достижения:</label>
+                <input type="date" class="form-control" name="dateAchieved" required />
+            </div>
+            <div class="form-group col-md-6">
+                <label for="employeeId">Сотрудник:</label>
+                <select class="form-control" name="employeeId" required>
+                    <option value="">Выберите сотрудника</option>
+                    <!-- Employee options will be populated here -->
+                </select>
+            </div>
+            <div class="panel-body">
+                <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
+                <a id="reset" class="btn btn-secondary">Сбросить</a>
+            </div>
+        </form>
+
+        <div class="form-group col-md-6">
+            <label for="filter">Фильтровать по описанию:</label>
+            <input class="form-control" id="filter" placeholder="Введите описание" />
+        </div>
+
+        <table class="table table-condensed table-striped col-md-8">
+            <thead>
+                <tr><th>Id</th><th>Описание</th><th>Дата достижения</th><th>Сотрудник</th><th></th></tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <div class="pagination-container">
+            <button id="prevPage" class="btn btn-secondary">Предыдущая</button>
+            <button id="nextPage" class="btn btn-secondary">Следующая</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const pageSize = 8;
+
+        document.getElementById("filter").addEventListener("input", () => {
+            currentPage = 1;
+            GetAchievements();
+        });
+
+        async function GetEmployees() {
+            const response = await fetch("/api/employees", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok) {
+                const employees = await response.json();
+                const select = document.querySelector("select[name='employeeId']");
+                employees.forEach(employee => {
+                    const option = document.createElement("option");
+                    option.value = employee.employeeId;
+                    option.textContent = employee.fullName;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        async function GetAchievements() {
+            const filterValue = document.getElementById("filter").value;
+            const response = await fetch(`/api/achievements?pageNumber=${currentPage}&pageSize=${pageSize}&searchDescription=${filterValue}`, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok) {
+                const achievements = await response.json();
+                renderAchievements(achievements);
+            }
+        }
+
+        function renderAchievements(achievements) {
+            let rows = document.querySelector("tbody");
+            rows.innerHTML = "";
+            achievements.forEach(achievement => {
+                rows.append(row(achievement));
+            });
+        }
+
+        async function CreateAchievement(description, dateAchieved, employeeId) {
+            const response = await fetch("/api/achievements", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    description,
+                    dateAchieved,
+                    employeeId
+                })
+            });
+            if (response.ok) {
+                await GetAchievements();
+            }
+        }
+
+        async function EditAchievement(id, description, dateAchieved, employeeId) {
+            const response = await fetch(`/api/achievements/${id}`, {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id,
+                    description,
+                    dateAchieved,
+                    employeeId
+                })
+            });
+            if (response.ok) {
+                await GetAchievements();
+            }
+        }
+
+        async function DeleteAchievement(id) {
+            const response = await fetch(`/api/achievements/${id}`, {
+                method: "DELETE",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok) {
+                await GetAchievements();
+            }
+        }
+
+        function reset() {
+            const form = document.forms["achievementForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+            const select = document.querySelector("select[name='employeeId']");
+            select.selectedIndex = 0;
+        }
+
+        function row(achievement) {
+            const tr = document.createElement("tr");
+            tr.setAttribute("data-rowid", achievement.achievementId);
+
+            const idTd = document.createElement("td");
+            idTd.append(achievement.achievementId);
+            tr.append(idTd);
+
+            const descriptionTd = document.createElement("td");
+            descriptionTd.append(achievement.description);
+            tr.append(descriptionTd);
+
+            const dateTd = document.createElement("td");
+            dateTd.append(new Date(achievement.dateAchieved).toLocaleDateString());
+            tr.append(dateTd);
+
+            const employeeTd = document.createElement("td");
+            employeeTd.append(achievement.employeeId);
+            tr.append(employeeTd);
+
+            const linksTd = document.createElement("td");
+
+            const editLink = document.createElement("a");
+            editLink.setAttribute("data-id", achievement.achievementId);
+            editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            editLink.append("Изменить");
+            editLink.addEventListener("click", e => {
+                e.preventDefault();
+                GetAchievement(achievement.achievementId);
+            });
+            linksTd.append(editLink);
+
+            const removeLink = document.createElement("a");
+            removeLink.setAttribute("data-id", achievement.achievementId);
+            removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            removeLink.append("Удалить");
+            removeLink.addEventListener("click", e => {
+                e.preventDefault();
+                DeleteAchievement(achievement.achievementId);
+            });
+
+            linksTd.append(removeLink);
+            tr.appendChild(linksTd);
+
+            return tr;
+        }
+
+        async function GetAchievement(id) {
+            const response = await fetch(`/api/achievements/${id}`, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok) {
+                const achievement = await response.json();
+                const form = document.forms["achievementForm"];
+                form.elements["id"].value = achievement.achievementId;
+                form.elements["description"].value = achievement.description;
+                form.elements["dateAchieved"].value = achievement.dateAchieved;
+                form.elements["employeeId"].value = achievement.employeeId;
+            }
+        }
+
+        document.getElementById("reset").addEventListener("click", function (e) {
+            e.preventDefault();
+            reset();
+        });
+
+        document.forms["achievementForm"].addEventListener("submit", e => {
+            e.preventDefault();
+            const form = document.forms["achievementForm"];
+            const id = form.elements["id"].value;
+            const description = form.elements["description"].value;
+            const dateAchieved = form.elements["dateAchieved"].value;
+            const employeeId = form.elements["employeeId"].value;
+            if (id == 0)
+                CreateAchievement(description, dateAchieved, employeeId);
+            else
+                EditAchievement(id, description, dateAchieved, employeeId);
+        });
+
+        document.getElementById("prevPage").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                GetAchievements();
+            }
+        });
+
+        document.getElementById("nextPage").addEventListener("click", () => {
+            currentPage++;
+            GetAchievements();
+        });
+
+        GetEmployees();
+        GetAchievements();
+    </script>
+</body>
+</html>
