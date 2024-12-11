@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PerformanceRatingSystem.Infrastructure;
 using PerformanceRatingSystem.Infrastructure.Repositories;
 using PerformanceRatingSystem.Domain.Abstractions;
+using Microsoft.OpenApi.Models;
 
 namespace PerformanceRatingSystem.Web.Extensions;
 
@@ -32,5 +33,24 @@ public static class ServiceExtensions
 		services.AddScoped<IEmployeePerformanceIndicatorRepository, EmployeePerformanceIndicatorRepository>();
 		services.AddScoped<IAchievementRepository, AchievementRepository>();
 		services.AddScoped<IActualPerformanceResultRepository, ActualPerformanceResultRepository>();
+    }
+
+    public static void ConfigureSwagger(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(s =>
+        {
+            s.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "PerformanceRatingSystem Web API",
+                Version = "v1",
+                Description = "PerformanceRatingSystem Web API by mikhael1235",
+                TermsOfService = new Uri("https://github.com/mikhael1235/PerformanceRatingSystem"),
+                Contact = new OpenApiContact
+                {
+                    Name = "mikhael1235",
+                    Url = new Uri("https://t.me/liu_kredit"),
+                },
+            });
+        });
     }
 }

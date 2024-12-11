@@ -52,8 +52,8 @@ public class DepartmentRepository(EmployeePerformanceContext dbContext) : IDepar
 
     public async Task<Department?> GetById(Guid id, bool trackChanges) =>
         await (!trackChanges ?
-            _dbContext.Departments.Include(x => x.Employees).AsNoTracking() :
-            _dbContext.Departments.Include(x => x.Employees)).SingleOrDefaultAsync(e => e.DepartmentId == id);
+            _dbContext.Departments.AsNoTracking() :
+            _dbContext.Departments).SingleOrDefaultAsync(e => e.DepartmentId == id);
 
     public void Delete(Department entity) => _dbContext.Departments.Remove(entity);
 
