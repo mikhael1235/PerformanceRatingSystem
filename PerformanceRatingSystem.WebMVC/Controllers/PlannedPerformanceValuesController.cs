@@ -42,6 +42,7 @@ public class PlannedPerformanceValuesController(IMediator mediator) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create()
     {
         var indicators = await _mediator.Send(new GetDepartmentPerformanceIndicatorsQuery(new()
@@ -71,6 +72,7 @@ public class PlannedPerformanceValuesController(IMediator mediator) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Edit(Guid id)
     {
         var isEntityFound = await _mediator.Send(new GetPlannedPerformanceValueByIdQuery(id));
@@ -120,6 +122,7 @@ public class PlannedPerformanceValuesController(IMediator mediator) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(Guid? id)
     {
         if (id == null)

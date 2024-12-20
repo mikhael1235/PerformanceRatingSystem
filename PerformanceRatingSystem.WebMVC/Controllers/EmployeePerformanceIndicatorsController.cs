@@ -40,6 +40,7 @@ public class EmployeePerformanceIndicatorsController(IMediator mediator) : Contr
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create()
     {
         var employees = await _mediator.Send(new GetEmployeesQuery(new()
@@ -70,6 +71,7 @@ public class EmployeePerformanceIndicatorsController(IMediator mediator) : Contr
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Edit(Guid id)
     {
         var isEntityFound = await _mediator.Send(new GetEmployeePerformanceIndicatorByIdQuery(id));
@@ -115,6 +117,7 @@ public class EmployeePerformanceIndicatorsController(IMediator mediator) : Contr
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(Guid? id)
     {
         if (id == null)

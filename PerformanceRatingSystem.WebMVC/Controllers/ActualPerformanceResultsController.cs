@@ -51,6 +51,7 @@ public class ActualPerformanceResultsController(IMediator mediator) : Controller
 
  
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create()
  
     {
@@ -89,7 +90,7 @@ public class ActualPerformanceResultsController(IMediator mediator) : Controller
 
  
     [HttpGet]
- 
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Edit(Guid id)
  
     {
@@ -163,7 +164,7 @@ public class ActualPerformanceResultsController(IMediator mediator) : Controller
     }
 
     [HttpGet]
- 
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(Guid? id)
  
     {

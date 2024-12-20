@@ -61,6 +61,7 @@ public class DepartmentsController : Controller
 
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public IActionResult Create()
     {
         return View();
@@ -81,6 +82,7 @@ public class DepartmentsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Edit(Guid id)
     {
         var isEntityFound = await _mediator.Send(new GetDepartmentByIdQuery(id));
@@ -117,6 +119,7 @@ public class DepartmentsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(Guid? id)
     {
         if (id == null)
