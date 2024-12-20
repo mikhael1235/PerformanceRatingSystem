@@ -65,6 +65,7 @@ public class EmployeesController(IMediator mediator) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create()
     {
         var departments = await _mediator.Send(new GetAllDepartmentsQuery());
@@ -90,6 +91,7 @@ public class EmployeesController(IMediator mediator) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Edit(Guid id)
     {
         var isEntityFound = await _mediator.Send(new GetEmployeeByIdQuery(id));
@@ -136,6 +138,7 @@ public class EmployeesController(IMediator mediator) : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(Guid? id)
     {
         if (id == null)

@@ -45,6 +45,7 @@ public class DepartmentPerformanceIndicatorsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create()
     {
         var departments = await _mediator.Send(new GetAllDepartmentsQuery());
@@ -71,6 +72,7 @@ public class DepartmentPerformanceIndicatorsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Edit(Guid id)
     {
         var isEntityFound = await _mediator.Send(new GetDepartmentPerformanceIndicatorByIdQuery(id));
@@ -113,6 +115,7 @@ public class DepartmentPerformanceIndicatorsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(Guid? id)
     {
         if (id == null)

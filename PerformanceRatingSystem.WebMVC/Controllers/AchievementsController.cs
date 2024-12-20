@@ -51,6 +51,7 @@ public class AchievementsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create()
     {
  
@@ -85,47 +86,29 @@ public class AchievementsController : Controller
 
  
     [HttpGet]
-
- 
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Edit(Guid id)
- 
     {
- 
         var isEntityFound = await _mediator.Send(new GetAchievementByIdQuery(id));
- 
         if (isEntityFound == null)
- 
         {
- 
             return NotFound();
- 
         }
  
-
- 
         AchievementForUpdateDto model = new()
- 
         {
- 
             DateAchieved = isEntityFound.DateAchieved,
- 
             Description = isEntityFound.Description,
- 
             EmployeeId = isEntityFound.EmployeeId,
- 
         };
- 
-
- 
+        
         var employees = await _mediator.Send(new GetEmployeesQuery(new()
         {
             PageSize = 500
         }));
 
         ViewData["EmployeeId"] = new SelectList(employees, "EmployeeId", "FullName");
- 
-
- 
+        
         return View(model);
  
     }
@@ -152,27 +135,17 @@ public class AchievementsController : Controller
 
  
     [HttpGet]
- 
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(Guid? id)
- 
     {
- 
         if (id == null)
- 
         {
- 
             return NotFound();
- 
         }
- 
-
- 
+        
         var achievement = await _mediator.Send(new GetAchievementByIdQuery((Guid)id));
- 
-
- 
+        
         return View(achievement);
- 
     }
 
     [HttpPost, ActionName("Delete")]
